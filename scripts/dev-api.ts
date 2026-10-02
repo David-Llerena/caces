@@ -14,6 +14,7 @@ const rutas: Record<string, () => Promise<{ default: (req: Req, res: Res) => Pro
   '/api/admin/usuario': () => import('../api/admin/usuario.js'),
   '/api/admin/actividad': () => import('../api/admin/actividad.js'),
   '/api/estado': () => import('../api/estado.js'),
+  '/api/diagnostico': () => import('../api/diagnostico.js'),
   '/api/intento': () => import('../api/intento.js'),
   '/api/respuesta': () => import('../api/respuesta.js'),
   '/api/enviar': () => import('../api/enviar.js'),

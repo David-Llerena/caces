@@ -1,4 +1,14 @@
 // Configuración del simulacro (variables de entorno en Vercel)
+export const VERSION = 'v6-admin-tolerante';
+
+/** Limpia valores pegados con comillas, espacios o con "NOMBRE=" adelante */
+function limpio(nombre: string): string {
+  return (process.env[nombre] ?? '')
+    .trim()
+    .replace(new RegExp(`^${nombre}\\s*=\\s*`, 'i'), '')
+    .replace(/^["'](.*)["']$/s, '$1')
+    .trim();
+}
 function num(name: string, def: number): number {
   const v = Number(process.env[name]);
   return Number.isFinite(v) && process.env[name] !== '' && process.env[name] !== undefined ? v : def;
@@ -19,17 +29,14 @@ export const config = {
   },
   /** Mostrar al estudiante qué preguntas tuvo bien y mal al terminar */
   get mostrarRevision() { return (process.env.MOSTRAR_REVISION ?? 'true').toLowerCase() !== 'false'; },
-  get adminKey() { return process.env.ADMIN_KEY ?? ''; },
-  get adminUsuario() { return (process.env.ADMIN_USUARIO ?? 'admin').trim(); },
+  get adminKey() { return limpio('ADMIN_KEY'); },
+  get adminUsuario() { return limpio('ADMIN_USUARIO') || 'admin'; },
   /**
    * Usuarios habilitados: USUARIOS="usuario1:clave1,usuario2:clave2"
    * (también acepta ; o saltos de línea como separador)
    */
   get usuarios(): { usuario: string; clave: string }[] {
-    return (process.env.USUARIOS ?? '')
-      .trim()
-      .replace(/^USUARIOS\s*=\s*/i, '')    // por si se pegó "USUARIOS=..." dentro del valor
-      .replace(/^["']|["']$/g, '')          // por si se pegó entre comillas
+    return limpio('USUARIOS')
       .split(/[,;\n\s]+/)
       .map((par) => {
         const i = par.indexOf(':');
