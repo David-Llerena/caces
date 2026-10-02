@@ -19,7 +19,7 @@ export default route(['POST'], async (req, res) => {
 
   // ---- Administrador ----
   if (usuario.toLowerCase() === config.adminUsuario.toLowerCase()) {
-    if (config.adminKey.length < 12 || !iguales(clave, config.adminKey)) throw new HttpError(401, ERROR);
+    if (!config.adminKey || !iguales(clave, config.adminKey)) throw new HttpError(401, ERROR);
     res.status(200).json({ rol: 'admin', token: await firmarAdmin() });
     return;
   }

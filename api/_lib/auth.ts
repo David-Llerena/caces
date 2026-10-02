@@ -49,7 +49,7 @@ export async function requireEstudiante(req: Req): Promise<number> {
 export async function requireAdmin(req: Req): Promise<void> {
   const clave = header(req, 'x-admin-key');
   if (clave) {
-    if (config.adminKey.length >= 12 && iguales(clave, config.adminKey)) return;
+    if (config.adminKey && iguales(clave, config.adminKey)) return;
     throw new HttpError(401, 'Clave de administrador inválida');
   }
   const token = bearer(req) || query(req, 'token');
