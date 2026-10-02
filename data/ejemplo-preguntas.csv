@@ -1,0 +1,11 @@
+codigo,area,enunciado,a,b,c,d,correcta
+P001,Razonamiento,"Si todos los A son B y algunos B son C, ¿cuál afirmación es necesariamente verdadera?",Todos los A son C,Algunos A son C,Ningún A es C,No se puede concluir que algún A sea C,D
+P002,Razonamiento,"Complete la serie: 2, 6, 12, 20, 30, ...",40,42,44,36,B
+P003,Razonamiento,"Un artículo cuesta $80 y tiene un descuento del 15%. ¿Cuál es el precio final?",$65,$68,$70,$72,B
+P004,Tecnología,¿Qué protocolo se usa para asignar direcciones IP de forma automática?,DNS,DHCP,FTP,SMTP,B
+P005,Tecnología,"En SQL, ¿qué cláusula filtra resultados después de un GROUP BY?",WHERE,ORDER BY,HAVING,LIMIT,C
+P006,Tecnología,¿Cuál de estas estructuras sigue el principio LIFO?,Cola,Pila,Árbol,Grafo,B
+P007,Tecnología,"En el modelo OSI, ¿en qué capa opera un router?",Física,Enlace de datos,Red,Transporte,C
+P008,Gestión,¿Qué metodología ágil organiza el trabajo en sprints de duración fija?,Kanban,Scrum,Cascada,PMBOK,B
+P009,Gestión,"En un proyecto, la ruta crítica es:",La secuencia de tareas más larga que determina la duración mínima,El conjunto de tareas más costosas,Las tareas con más recursos asignados,Las tareas que pueden retrasarse sin afectar el proyecto,A
+P010,Gestión,¿Qué indicador mide la relación entre beneficio y costo de una inversión?,ROI,KPI,SLA,CRM,A
