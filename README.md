@@ -156,3 +156,4 @@ npm run db:cargar
 
 - **Planes gratuitos:** Vercel Hobby y Neon Free alcanzan de sobra para un grupo. Revisa sus condiciones vigentes; el plan Hobby de Vercel está pensado para uso no comercial.
 - **No es proctoring:** no impide que el estudiante consulte en otra pestaña.
+# caces
