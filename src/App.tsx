@@ -17,11 +17,6 @@ type Vista =
   | { tipo: 'resultado'; resultado: Resultado };
 
 export default function App() {
-  if (window.location.pathname.replace(/\/+$/, '') === '/admin') return <Admin />;
-  return <AppEstudiante />;
-}
-
-function AppEstudiante() {
   const [sesion, setSesion] = useState<Sesion | null>(sesionGuardada());
   const [vista, setVista] = useState<Vista>({ tipo: sesion ? 'cargando' : 'login' });
 
@@ -34,14 +29,15 @@ function AppEstudiante() {
 
   const irAInicio = () => api.estado().then((estado) => setVista({ tipo: 'inicio', estado })).catch(manejarError);
 
-  useEffect(() => { if (sesion) irAInicio(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (sesion && sesion.rol !== 'admin') irAInicio(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const alIngresar = (s: Sesion, estado: Estado) => {
+  const alIngresar = (s: Sesion, estado?: Estado) => {
     guardarSesion(s); setToken(s.token); setSesion(s);
-    setVista({ tipo: 'inicio', estado });
+    setVista(estado ? { tipo: 'inicio', estado } : { tipo: 'cargando' });
   };
 
   if (vista.tipo === 'login' || !sesion) return <Login onIngreso={alIngresar} />;
+  if (sesion.rol === 'admin') return <Admin onSalir={salir} />;
   if (vista.tipo === 'cargando') return <div className="pantalla-centro"><div className="spinner" /></div>;
 
   if (vista.tipo === 'inicio') {

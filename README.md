@@ -20,6 +20,25 @@ Navegador ──HTTPS──> Vercel  (https://tu-proyecto.vercel.app)
 3. Al terminar ve **su nota**, el desglose por área y la **revisión pregunta por pregunta**: su respuesta, la correcta y si acertó. Puede filtrar por correctas, incorrectas o sin responder.
 4. Tú ves todo en **`/admin`**.
 
+## Acceso: 4 usuarios + administrador (versión actual)
+
+Solo pueden entrar los usuarios definidos en la variable **`USUARIOS`** de Vercel, más el administrador. Todos usan la misma pantalla de ingreso:
+
+| Variable | Ejemplo | Para qué |
+|---|---|---|
+| `USUARIOS` | `usuario1:clave1,usuario2:clave2,usuario3:clave3,usuario4:clave4` | Los únicos que pueden rendir. Formato `usuario:contraseña`, separados por coma |
+| `ADMIN_USUARIO` | `admin` | Usuario del administrador |
+| `ADMIN_KEY` | (mínimo 12 caracteres) | Contraseña del administrador |
+
+- Si el usuario es el admin, entra directo al **panel del histórico**.
+- Un usuario que no esté en la lista, o con la contraseña incorrecta, ve "Usuario o contraseña incorrectos". Tras 5 fallos seguidos, ese usuario queda bloqueado 10 minutos.
+- Si un estudiante cierra la página, vuelve a ingresar y **continúa su examen** con el mismo reloj.
+- El panel muestra siempre a los usuarios configurados, aunque todavía no hayan ingresado: último ingreso, veces que ingresó, estado, nota y respuestas.
+- Para agregar, quitar o cambiar contraseñas, edita `USUARIOS` en Vercel y haz **Redeploy**. No hace falta tocar la base: las columnas nuevas se crean solas en el primer ingreso.
+- **Dar otro intento a un usuario:** `DELETE FROM intento WHERE estudiante_id = (SELECT id FROM estudiante WHERE lower(alias) = 'usuario1');`. También puedes subir `MAX_INTENTOS`.
+
+> Las secciones de abajo hablan de "alias"; ahora el alias es el nombre de usuario de `USUARIOS`.
+
 ## ¿Dónde se guarda el histórico?
 
 Todo queda en la base PostgreSQL (Neon) y nada se borra:
@@ -156,4 +175,3 @@ npm run db:cargar
 
 - **Planes gratuitos:** Vercel Hobby y Neon Free alcanzan de sobra para un grupo. Revisa sus condiciones vigentes; el plan Hobby de Vercel está pensado para uso no comercial.
 - **No es proctoring:** no impide que el estudiante consulte en otra pestaña.
-# caces

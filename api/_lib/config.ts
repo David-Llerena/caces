@@ -18,6 +18,20 @@ export const config = {
   /** Mostrar al estudiante qué preguntas tuvo bien y mal al terminar */
   get mostrarRevision() { return (process.env.MOSTRAR_REVISION ?? 'true').toLowerCase() !== 'false'; },
   get adminKey() { return process.env.ADMIN_KEY ?? ''; },
+  get adminUsuario() { return (process.env.ADMIN_USUARIO ?? 'admin').trim(); },
+  /**
+   * Usuarios habilitados: USUARIOS="usuario1:clave1,usuario2:clave2"
+   * (también acepta ; o saltos de línea como separador)
+   */
+  get usuarios(): { usuario: string; clave: string }[] {
+    return (process.env.USUARIOS ?? '')
+      .split(/[,;\n]+/)
+      .map((par) => {
+        const i = par.indexOf(':');
+        return i > 0 ? { usuario: par.slice(0, i).trim(), clave: par.slice(i + 1).trim() } : null;
+      })
+      .filter((u): u is { usuario: string; clave: string } => !!u && u.usuario.length > 0 && u.clave.length > 0);
+  },
 };
 
 /** Segundos de gracia para latencia de red al guardar/enviar */

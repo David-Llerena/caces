@@ -10,7 +10,7 @@ export interface Estado {
   intentoEnCurso: { id: number; expiraEn: string } | null;
   historial: Historial[];
 }
-export interface Sesion { token: string; estudiante: { alias: string } }
+export interface Sesion { token: string; rol: 'estudiante' | 'admin'; estudiante: { alias: string } }
 export interface IntentoData {
   intentoId: number; numero: number; iniciadoEn: string; expiraEn: string; ahoraServidor: string;
   preguntas: Pregunta[]; respuestas: Record<number, number>;
@@ -27,14 +27,15 @@ export interface ItemRevision {
   elegida: number | null; acierto: boolean;
 }
 export interface Participante {
-  id: number; alias: string; creadoEn: string; ip: string | null; navegador: string | null;
+  id: number | null; alias: string; ultimoIngreso: string | null; ingresos: number; intentos: number;
+  ip: string | null; navegador: string | null;
   intentoId: number | null; estado: 'EN_CURSO' | 'FINALIZADO' | null;
   iniciadoEn: string | null; finalizadoEn: string | null; expiraEn: string | null;
   respondidas: number; correctas: number | null; total: number | null; porcentaje: number | null;
 }
 export interface ResumenAdmin {
   config: { duracionMinutos: number; porcentajeAprobacion: number };
-  totales: { participantes: number; enCurso: number; sinIniciar: number; finalizados: number; aprobados: number; promedio: number | null };
+  totales: { participantes: number; ingresaron: number; noIngresaron: number; enCurso: number; sinIniciar: number; finalizados: number; aprobados: number; promedio: number | null };
   participantes: Participante[];
 }
 
@@ -71,7 +72,9 @@ async function http<T>(path: string, init: RequestInit = {}): Promise<T> {
 const post = <T>(path: string, body?: unknown) => http<T>(path, { method: 'POST', body: JSON.stringify(body ?? {}) });
 
 export const api = {
-  ingresar: (alias: string) => post<Sesion & { estado: Estado }>('ingresar', { alias }),
+  ingresar: (usuario: string, clave: string) =>
+    post<{ rol: 'admin'; token: string } | { rol: 'estudiante'; token: string; estudiante: { alias: string }; estado: Estado }>(
+      'ingresar', { usuario, clave }),
   estado: () => http<Estado>('estado'),
   iniciar: () => post<IntentoData>('intento'),
   responder: (intentoId: number, preguntaId: number, opcionId: number | null) =>
@@ -80,9 +83,9 @@ export const api = {
   resultado: (id: number) => http<Resultado>(`resultado?id=${id}`),
 };
 
+// El panel usa el mismo token de sesión (rol admin)
 export const adminApi = {
-  resumen: (clave: string) => http<ResumenAdmin>('admin/resumen', { headers: { 'x-admin-key': clave } }),
-  detalle: (clave: string, intento: number) =>
-    http<Resultado & { alias: string }>(`admin/detalle?intento=${intento}`, { headers: { 'x-admin-key': clave } }),
-  urlCsv: (clave: string) => `/api/admin/resultados?key=${encodeURIComponent(clave)}`,
+  resumen: () => http<ResumenAdmin>('admin/resumen'),
+  detalle: (intento: number) => http<Resultado & { alias: string }>(`admin/detalle?intento=${intento}`),
+  urlCsv: () => `/api/admin/resultados?token=${encodeURIComponent(token)}`,
 };

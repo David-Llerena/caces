@@ -1,5 +1,5 @@
 import { getPool } from '../_lib/db.js';
-import { route, header, query } from '../_lib/http.js';
+import { route } from '../_lib/http.js';
 import { requireAdmin } from '../_lib/auth.js';
 import { config } from '../_lib/config.js';
 import { cerrarTodosLosVencidos, listarParticipantes } from '../_lib/admin.js';
@@ -9,16 +9,16 @@ const csv = (v: unknown) => {
   return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
-// GET /api/admin/resultados?key=CLAVE   (o header x-admin-key)  → descarga CSV
+// GET /api/admin/resultados?token=TOKEN_ADMIN  → descarga CSV
 export default route(['GET'], async (req, res) => {
-  requireAdmin(header(req, 'x-admin-key') || query(req, 'key'));
+  await requireAdmin(req);
   const db = getPool();
   await cerrarTodosLosVencidos(db);
   const filas = await listarParticipantes(db);
 
-  const cab = ['alias', 'ingreso', 'estado', 'inicio_examen', 'fin_examen', 'respondidas', 'correctas', 'total', 'porcentaje', 'aprobado', 'ip'];
+  const cab = ['usuario', 'ultimo_ingreso', 'veces_ingreso', 'intentos', 'estado', 'inicio_examen', 'fin_examen', 'respondidas', 'correctas', 'total', 'porcentaje', 'aprobado', 'ip'];
   const lineas = [cab.join(','), ...filas.map((p) => [
-    p.alias, p.creadoEn, p.estado ?? 'SIN_INICIAR', p.iniciadoEn, p.finalizadoEn, p.respondidas,
+    p.alias, p.ultimoIngreso, p.ingresos, p.intentos, p.estado ?? (p.ultimoIngreso ? 'SIN_INICIAR' : 'NO_INGRESO'), p.iniciadoEn, p.finalizadoEn, p.respondidas,
     p.correctas, p.total, p.porcentaje,
     p.estado === 'FINALIZADO' ? ((p.porcentaje ?? 0) >= config.porcentajeAprobacion ? 'SI' : 'NO') : '',
     p.ip,

@@ -3,8 +3,10 @@ import { api, ApiError, setToken, type Estado, type Sesion } from '../api';
 import { SUBTITULO, TITULO } from '../App';
 import { TrazoECG } from './Iconos';
 
-export default function Login({ onIngreso }: { onIngreso: (s: Sesion, e: Estado) => void }) {
-  const [alias, setAlias] = useState('');
+export default function Login({ onIngreso }: { onIngreso: (s: Sesion, e?: Estado) => void }) {
+  const [usuario, setUsuario] = useState('');
+  const [clave, setClave] = useState('');
+  const [verClave, setVerClave] = useState(false);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -12,12 +14,12 @@ export default function Login({ onIngreso }: { onIngreso: (s: Sesion, e: Estado)
     ev.preventDefault();
     setError(''); setCargando(true);
     try {
-      const r = await api.ingresar(alias.trim());
+      const r = await api.ingresar(usuario.trim(), clave);
       setToken(r.token);
-      onIngreso({ token: r.token, estudiante: r.estudiante }, r.estado);
+      if (r.rol === 'admin') onIngreso({ token: r.token, rol: 'admin', estudiante: { alias: 'Administrador' } });
+      else onIngreso({ token: r.token, rol: 'estudiante', estudiante: r.estudiante }, r.estado);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'No se pudo ingresar. Revisa tu conexión e intenta de nuevo.');
-    } finally {
       setCargando(false);
     }
   };
@@ -35,23 +37,30 @@ export default function Login({ onIngreso }: { onIngreso: (s: Sesion, e: Estado)
 
       <section className="login-form">
         <form onSubmit={enviar} noValidate>
-          <h2>Ingresa con tu alias</h2>
-          <p className="ayuda">Tu nota quedará registrada con este alias.</p>
+          <h2>Ingresa a tu cuenta</h2>
+          <p className="ayuda">Usa el usuario y la contraseña que te entregaron.</p>
 
           <label className="campo">
-            Alias
-            <input autoFocus autoComplete="off" spellCheck={false} maxLength={30} value={alias}
-                   onChange={(e) => setAlias(e.target.value.replace(/\s/g, ''))}
-                   placeholder="estudiante1" aria-describedby="alias-ayuda" />
-            <span id="alias-ayuda" className="campo-ayuda">De 3 a 30 caracteres, sin espacios. Debe ser uno que nadie haya usado.</span>
+            Usuario
+            <input autoFocus autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={40}
+                   value={usuario} onChange={(e) => setUsuario(e.target.value.replace(/\s/g, ''))} />
+          </label>
+
+          <label className="campo">
+            Contraseña
+            <span className="campo-clave">
+              <input type={verClave ? 'text' : 'password'} autoComplete="current-password" maxLength={100}
+                     value={clave} onChange={(e) => setClave(e.target.value)} />
+              <button type="button" className="ver-clave" onClick={() => setVerClave((v) => !v)}
+                      aria-pressed={verClave}>{verClave ? 'Ocultar' : 'Mostrar'}</button>
+            </span>
           </label>
 
           {error && <div className="alerta alerta-error" role="alert">{error}</div>}
 
-          <button className="btn btn-primario btn-bloque" disabled={cargando || alias.trim().length < 3}>
-            {cargando ? 'Verificando alias…' : 'Ingresar'}
+          <button className="btn btn-primario btn-bloque" disabled={cargando || !usuario.trim() || !clave}>
+            {cargando ? 'Verificando…' : 'Ingresar'}
           </button>
-          <p className="ayuda">Durante el examen no cierres la pestaña: el alias solo sirve una vez.</p>
         </form>
       </section>
     </div>

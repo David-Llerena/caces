@@ -3,7 +3,7 @@
 -- Idempotente: se puede ejecutar varias veces sin romper nada.
 -- =====================================================================
 
--- Participantes: cada persona entra con un alias único (ej. estudiante1)
+-- Participantes: un registro por usuario habilitado (se crea en su primer ingreso)
 CREATE TABLE IF NOT EXISTS estudiante (
     id          SERIAL PRIMARY KEY,
     alias       VARCHAR(30)  NOT NULL,
@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS estudiante (
 );
 -- Alias único sin importar mayúsculas: "Estudiante1" = "estudiante1"
 CREATE UNIQUE INDEX IF NOT EXISTS ux_estudiante_alias ON estudiante (lower(alias));
+-- v2: usuarios fijos con contraseña (USUARIOS en Vercel)
+ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ultimo_ingreso  TIMESTAMPTZ;
+ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ingresos        INT NOT NULL DEFAULT 0;
+ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS fallos_login    INT NOT NULL DEFAULT 0;
+ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
 
 -- Banco de preguntas
 CREATE TABLE IF NOT EXISTS pregunta (

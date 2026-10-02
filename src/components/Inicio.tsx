@@ -39,7 +39,7 @@ export default function Inicio({ sesion, estado, onComenzar, onVerResultado, onS
           </dl>
           <ul className="reglas">
             <li><Check /><span>El tiempo empieza al presionar <strong>Comenzar</strong> y corre aunque cierres la página.</span></li>
-            <li><Check /><span>Cada respuesta se guarda automáticamente. Si recargas la página, continúas donde ibas; <strong>no cierres la pestaña</strong>.</span></li>
+            <li><Check /><span>Cada respuesta se guarda automáticamente. Si se cierra la página, vuelve a ingresar con tu usuario y continúas donde ibas.</span></li>
             <li><Check /><span>Puedes marcar preguntas para revisarlas antes de finalizar.</span></li>
             <li><Check /><span>Al acabarse el tiempo, el examen se envía solo con lo que hayas respondido.</span></li>
             <li><Check /><span>Al finalizar verás tu nota y qué preguntas tuviste bien y mal.</span></li>

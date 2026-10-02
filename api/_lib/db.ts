@@ -26,3 +26,16 @@ export async function withTx<T>(fn: (c: pg.PoolClient) => Promise<T>): Promise<T
     client.release();
   }
 }
+
+// Columnas agregadas después de la primera versión: se crean solas si faltan,
+// así no hay que volver a correr db:init en Neon.
+let esquemaListo: Promise<unknown> | undefined;
+export function asegurarEsquema(): Promise<unknown> {
+  esquemaListo ??= getPool().query(`
+    ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ultimo_ingreso  TIMESTAMPTZ;
+    ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ingresos        INT NOT NULL DEFAULT 0;
+    ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS fallos_login    INT NOT NULL DEFAULT 0;
+    ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
+  `).catch((e) => { esquemaListo = undefined; throw e; });
+  return esquemaListo;
+}
