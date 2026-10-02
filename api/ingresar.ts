@@ -55,6 +55,8 @@ export default route(['POST'], async (req, res) => {
            ingresos = estudiante.ingresos + 1, fallos_login = 0, bloqueado_hasta = NULL
      RETURNING id, alias`,
     [habilitado.usuario, ip, header(req, 'user-agent').slice(0, 300) || null]);
+  await db.query(`INSERT INTO acceso (estudiante_id, ip, navegador) VALUES ($1, $2, $3)`,
+    [e.id, ip, header(req, 'user-agent').slice(0, 300) || null]);
 
   res.status(200).json({
     rol: 'estudiante',

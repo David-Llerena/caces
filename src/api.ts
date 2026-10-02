@@ -32,6 +32,7 @@ export interface Participante {
   intentoId: number | null; estado: 'EN_CURSO' | 'FINALIZADO' | null;
   iniciadoEn: string | null; finalizadoEn: string | null; expiraEn: string | null;
   respondidas: number; correctas: number | null; total: number | null; porcentaje: number | null;
+  mejorNota: number | null;
 }
 export interface ResumenAdmin {
   config: { duracionMinutos: number; porcentajeAprobacion: number };
@@ -83,9 +84,24 @@ export const api = {
   resultado: (id: number) => http<Resultado>(`resultado?id=${id}`),
 };
 
+export interface IntentoAdmin {
+  id: number; numero: number; estado: 'EN_CURSO' | 'FINALIZADO'; iniciadoEn: string; finalizadoEn: string | null;
+  expiraEn: string; porTiempo: boolean; respondidas: number; totalPreguntas: number;
+  correctas: number | null; porcentaje: number | null;
+}
+export interface Evento {
+  alias: string; fecha: string; tipo: 'ingreso' | 'inicio' | 'fin'; numero: number | null;
+  porcentaje: number | null; intentoId: number | null; detalle: string | null; porTiempo: boolean;
+}
+export interface UsuarioAdmin {
+  usuario: Participante; porcentajeAprobacion: number; intentos: IntentoAdmin[]; actividad: Evento[];
+}
+
 // El panel usa el mismo token de sesión (rol admin)
 export const adminApi = {
   resumen: () => http<ResumenAdmin>('admin/resumen'),
   detalle: (intento: number) => http<Resultado & { alias: string }>(`admin/detalle?intento=${intento}`),
+  usuario: (alias: string) => http<UsuarioAdmin>(`admin/usuario?alias=${encodeURIComponent(alias)}`),
+  actividad: () => http<Evento[]>('admin/actividad'),
   urlCsv: () => `/api/admin/resultados?token=${encodeURIComponent(token)}`,
 };

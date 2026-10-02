@@ -34,7 +34,7 @@ export default function Inicio({ sesion, estado, onComenzar, onVerResultado, onS
           <dl className="datos">
             <div><dt>Preguntas</dt><dd>{config.numPreguntas}</dd></div>
             <div><dt>Tiempo</dt><dd>{config.duracionMinutos} min</dd></div>
-            <div><dt>Intentos disponibles</dt><dd>{restantes} de {config.maxIntentos}</dd></div>
+            <div><dt>Intentos</dt><dd>{config.maxIntentos === 0 ? 'Ilimitados' : `${restantes} de ${config.maxIntentos}`}</dd></div>
             <div><dt>Para aprobar</dt><dd>{config.porcentajeAprobacion}%</dd></div>
           </dl>
           <ul className="reglas">

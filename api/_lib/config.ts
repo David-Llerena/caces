@@ -6,7 +6,9 @@ function num(name: string, def: number): number {
 
 export const config = {
   get duracionMinutos() { return num('DURACION_MINUTOS', 60); },
-  get maxIntentos() { return num('MAX_INTENTOS', 1); },
+  /** 0 (o vacío) = intentos ilimitados */
+  get maxIntentos() { return Math.max(0, num('MAX_INTENTOS', 0)); },
+  get intentosIlimitados() { return this.maxIntentos === 0; },
   /** 0 = todas las preguntas activas */
   get numPreguntas() { return num('NUM_PREGUNTAS', 0); },
   get porcentajeAprobacion() { return num('PORCENTAJE_APROBACION', 70); },
@@ -25,7 +27,10 @@ export const config = {
    */
   get usuarios(): { usuario: string; clave: string }[] {
     return (process.env.USUARIOS ?? '')
-      .split(/[,;\n]+/)
+      .trim()
+      .replace(/^USUARIOS\s*=\s*/i, '')    // por si se pegó "USUARIOS=..." dentro del valor
+      .replace(/^["']|["']$/g, '')          // por si se pegó entre comillas
+      .split(/[,;\n\s]+/)
       .map((par) => {
         const i = par.indexOf(':');
         return i > 0 ? { usuario: par.slice(0, i).trim(), clave: par.slice(i + 1).trim() } : null;

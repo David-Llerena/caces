@@ -66,7 +66,7 @@ export async function estadoEstudiante(db: Q, estudianteId: number) {
       porcentajeAprobacion: config.porcentajeAprobacion,
     },
     intentosUsados: rows.length,
-    puedeIniciar: !enCurso && rows.length < config.maxIntentos && numPreguntas > 0,
+    puedeIniciar: !enCurso && (config.intentosIlimitados || rows.length < config.maxIntentos) && numPreguntas > 0,
     intentoEnCurso: enCurso ? { id: enCurso.id, expiraEn: enCurso.expira_en } : null,
     historial: rows
       .filter((r) => r.estado === 'FINALIZADO')
@@ -91,7 +91,7 @@ export async function iniciarOReanudar(db: pg.PoolClient, estudianteId: number) 
   if (!intento) {
     const { rows: [{ usados }] } = await db.query<{ usados: number }>(
       `SELECT COUNT(*)::int AS usados FROM intento WHERE estudiante_id = $1`, [estudianteId]);
-    if (usados >= config.maxIntentos) throw new HttpError(409, 'Ya usaste todos tus intentos');
+    if (!config.intentosIlimitados && usados >= config.maxIntentos) throw new HttpError(409, 'Ya usaste todos tus intentos');
 
     // Selección aleatoria de preguntas activas
     const limite = config.numPreguntas > 0 ? config.numPreguntas : null;

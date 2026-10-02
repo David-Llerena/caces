@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Resultado as R, Sesion } from '../api';
 import Encabezado from './Encabezado';
 import Revision from './Revision';
@@ -45,8 +46,16 @@ export function PorArea({ r }: { r: R }) {
   );
 }
 
-export default function Resultado({ sesion, resultado: r, onVolver, onSalir }:
-  { sesion: Sesion; resultado: R; onVolver: () => void; onSalir: () => void }) {
+export default function Resultado({ sesion, resultado: r, onVolver, onSalir, onReintentar }:
+  { sesion: Sesion; resultado: R; onVolver: () => void; onSalir: () => void; onReintentar?: () => Promise<void> }) {
+  const [iniciando, setIniciando] = useState(false);
+  const [error, setError] = useState('');
+  const reintentar = async () => {
+    if (!onReintentar) return;
+    setIniciando(true); setError('');
+    try { await onReintentar(); }
+    catch (e) { setError(e instanceof Error ? e.message : 'No se pudo iniciar otro intento'); setIniciando(false); }
+  };
   return (
     <div className="pagina">
       <Encabezado nombre={sesion.estudiante.alias}
@@ -55,7 +64,15 @@ export default function Resultado({ sesion, resultado: r, onVolver, onSalir }:
         <Veredicto r={r} titulo={`Intento ${r.numero} de ${sesion.estudiante.alias}`} />
         <PorArea r={r} />
         {r.revision.length > 0 && <Revision items={r.revision} />}
-        <button className="btn btn-secundario volver" onClick={onVolver}>Volver al inicio</button>
+        {error && <div className="alerta alerta-error">{error}</div>}
+        <div className="acciones-final">
+          <button className="btn btn-secundario" onClick={onVolver}>Volver al inicio</button>
+          {onReintentar && (
+            <button className="btn btn-primario" onClick={reintentar} disabled={iniciando}>
+              {iniciando ? 'Preparando examen…' : 'Hacer otro intento'}
+            </button>
+          )}
+        </div>
       </main>
     </div>
   );

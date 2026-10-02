@@ -347,3 +347,36 @@ kbd { font: inherit; font-size: .8rem; font-weight: 700; padding: .05rem .4rem; 
 .ver-clave:hover { background: var(--scrub-claro); }
 .campo input { width: 100%; }
 .badge-nunca { background: transparent; border: 1px dashed var(--linea-fuerte); color: var(--suave); }
+.acciones-final { display: flex; gap: .75rem; justify-content: space-between; flex-wrap: wrap; }
+
+/* ---------- Histórico admin ---------- */
+.admin-usuario { display: grid; gap: 1.5rem; }
+.admin-usuario > *, .contenedor.estrecho > * { min-width: 0; }
+.btn-sm { white-space: nowrap; }
+.admin-usuario .admin-cab, .admin-usuario .kpis { margin-bottom: 0; }
+.actividad-general { margin-top: 1.5rem; }
+.tag-tiempo {
+  display: inline-block; margin-left: .5rem; padding: .05rem .5rem; border-radius: 999px;
+  background: var(--marca-claro); color: var(--marca); font-size: .78rem; font-weight: 700; white-space: nowrap;
+}
+.timeline section + section { margin-top: 1.25rem; }
+.timeline-dia { font-size: .95rem; color: var(--tinta); margin: 0 0 .5rem; text-transform: capitalize; }
+.timeline ol { list-style: none; margin: 0; padding: 0; }
+.evento { display: grid; grid-template-columns: 84px 14px 1fr; gap: .75rem; align-items: start; padding: .45rem 0; position: relative; }
+.evento time { white-space: nowrap; font-weight: 700; color: var(--suave); font-size: .9rem; padding-top: .05rem; }
+.evento-punto { width: 12px; height: 12px; margin-top: .3rem; border-radius: 50%; background: var(--linea-fuerte); position: relative; z-index: 1; }
+.evento:not(:last-child)::after { content: ''; position: absolute; left: calc(84px + .75rem + 5px); top: 1.5rem; bottom: -.6rem; width: 2px; background: var(--linea); }
+.evento-inicio .evento-punto { background: var(--scrub); }
+.evento-fin.aprobado .evento-punto { background: var(--bien); }
+.evento-fin.reprobado .evento-punto { background: var(--mal); }
+.evento-ingreso .evento-punto { background: var(--superficie); border: 2px solid var(--linea-fuerte); }
+.evento-texto { line-height: 1.5; }
+.evento-texto .ver { margin-left: .6rem; }
+@media (max-width: 600px) {
+  .evento { grid-template-columns: 76px 12px 1fr; gap: .5rem; }
+  .evento time { font-size: .8rem; }
+  .evento:not(:last-child)::after { left: calc(76px + .5rem + 4px); }
+  .evento-texto .ver { display: block; margin: .2rem 0 0; }
+  .encabezado .marca > div { display: none; }
+  .encabezado-der { gap: .5rem; }
+}

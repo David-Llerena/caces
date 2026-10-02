@@ -36,6 +36,14 @@ export function asegurarEsquema(): Promise<unknown> {
     ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ingresos        INT NOT NULL DEFAULT 0;
     ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS fallos_login    INT NOT NULL DEFAULT 0;
     ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
+    CREATE TABLE IF NOT EXISTS acceso (
+      id            SERIAL PRIMARY KEY,
+      estudiante_id INT NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
+      fecha         TIMESTAMPTZ NOT NULL DEFAULT now(),
+      ip            VARCHAR(64),
+      navegador     TEXT
+    );
+    CREATE INDEX IF NOT EXISTS ix_acceso_estudiante ON acceso (estudiante_id, fecha DESC);
   `).catch((e) => { esquemaListo = undefined; throw e; });
   return esquemaListo;
 }

@@ -19,6 +19,16 @@ ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS ingresos        INT NOT NULL DEF
 ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS fallos_login    INT NOT NULL DEFAULT 0;
 ALTER TABLE estudiante ADD COLUMN IF NOT EXISTS bloqueado_hasta TIMESTAMPTZ;
 
+-- v3: registro de cada ingreso (histórico por hora)
+CREATE TABLE IF NOT EXISTS acceso (
+    id            SERIAL PRIMARY KEY,
+    estudiante_id INT NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
+    fecha         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ip            VARCHAR(64),
+    navegador     TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_acceso_estudiante ON acceso (estudiante_id, fecha DESC);
+
 -- Banco de preguntas
 CREATE TABLE IF NOT EXISTS pregunta (
     id         SERIAL PRIMARY KEY,

@@ -69,5 +69,14 @@ export default function App() {
     );
   }
 
-  return <ResultadoView sesion={sesion} resultado={vista.resultado} onVolver={irAInicio} onSalir={salir} />;
+  return (
+    <ResultadoView
+      sesion={sesion} resultado={vista.resultado} onVolver={irAInicio} onSalir={salir}
+      onReintentar={async () => {
+        const estado = await api.estado();
+        if (!estado.puedeIniciar && !estado.intentoEnCurso) { setVista({ tipo: 'inicio', estado }); return; }
+        setVista({ tipo: 'examen', intento: await api.iniciar() });
+      }}
+    />
+  );
 }
